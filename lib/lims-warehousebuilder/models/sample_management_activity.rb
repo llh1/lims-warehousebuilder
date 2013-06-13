@@ -1,3 +1,5 @@
+require 'lims-warehousebuilder/core_ext'
+
 module Lims::WarehouseBuilder
   module Model
     class SampleManagementActivity < Sequel::Model(:historic_sample_management_activity)
@@ -42,7 +44,7 @@ module Lims::WarehouseBuilder
       # Remove samples.extraction. due to mysql limitation
       # on column name size.
       def format_role(role)
-        role.sub(/samples\.extraction\./, "").gsub(/\./, "_")
+        role.gsub(/\./, '_').contract
       end
 
       # @param [String] role

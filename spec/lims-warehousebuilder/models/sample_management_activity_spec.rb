@@ -20,9 +20,9 @@ module Lims::WarehouseBuilder
 
     let(:updated_object) do
       @model_helper.clone_model_object(object).tap do |s|
-        s.manual_dna_and_rna_input_tube_nap_uuid = item_uuid 
-        s.manual_dna_and_rna_input_tube_nap_pending_by = created_by
-        s.manual_dna_and_rna_input_tube_nap_pending_at = created_at
+        s.manual_dnr_input_tube_nap_uuid = item_uuid 
+        s.manual_dnr_input_tube_nap_pending_by = created_by
+        s.manual_dnr_input_tube_nap_pending_at = created_at
       end
     end
 
@@ -41,15 +41,15 @@ module Lims::WarehouseBuilder
 
       context "valid" do
         it "sets the item role uuid" do
-          activity.manual_dna_and_rna_input_tube_nap_uuid.should == item_uuid
+          activity.manual_dnr_input_tube_nap_uuid.should == item_uuid
         end
 
         it "sets the date" do
-          activity.manual_dna_and_rna_input_tube_nap_in_progress_at.to_s.should == at.to_s
+          activity.manual_dnr_input_tube_nap_in_progress_at.to_s.should == at.to_s
         end
 
         it "sets the username" do
-          activity.manual_dna_and_rna_input_tube_nap_in_progress_by.should == by
+          activity.manual_dnr_input_tube_nap_in_progress_by.should == by
         end
       end
 
@@ -58,11 +58,11 @@ module Lims::WarehouseBuilder
         let(:older_at) { at - 60 }
 
         it "doesn't update the group of fields if the date is more recent" do
-          activity.dispatch_attributes(item_uuid, role, status, newer_at.to_s, by).manual_dna_and_rna_input_tube_nap_in_progress_at.to_s.should == at.to_s
+          activity.dispatch_attributes(item_uuid, role, status, newer_at.to_s, by).manual_dnr_input_tube_nap_in_progress_at.to_s.should == at.to_s
         end
 
         it "updates the group of fields if the date is older" do
-          activity.dispatch_attributes(item_uuid, role, status, older_at.to_s, by).manual_dna_and_rna_input_tube_nap_in_progress_at.to_s.should == older_at.to_s
+          activity.dispatch_attributes(item_uuid, role, status, older_at.to_s, by).manual_dnr_input_tube_nap_in_progress_at.to_s.should == older_at.to_s
         end
       end
     end

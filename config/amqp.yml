@@ -1,6 +1,5 @@
 defaults: &defaults
   url: "amqp://localhost:5672"
-  exchange_name: "psd.s2"
   durable: true
   empty_queue_disconnect_interval: 0
 
@@ -10,12 +9,6 @@ test:
 development:
   <<: *defaults
   queue_name: "psd.s2.warehouse"
-  routing_keys:
-  - '*.*.tube.*'
-  - '*.*.spincolumn.*'
-  - '*.*.tuberack.*'
-  - '*.*.order.*'
-  - '*.*.transfertubestotubes.*'
 
 production:
   <<: *defaults

@@ -20,9 +20,10 @@ module Lims::WarehouseBuilder
         @payload = payload
       end
 
+      # @param [Hash] options
       # @return [Array<Sequel::Model>]
-      def call
-        result = _call
+      def call(options = {})
+        result = _call(options)
         result.is_a?(Array) ? result.flatten.compact : [result]
       end
 
@@ -46,6 +47,13 @@ module Lims::WarehouseBuilder
             value = complete_value(value, payload, payload_ancestor)
             payload_ancestor = {:model => key, :uuid => payload[key]["uuid"]}
             block.call(key, value)
+          elsif is_s2_resources_array?(key, value)
+            # Handle the case we have an array of resources like
+            # :samples => [{sample1}, {sample2},...]
+            # The following add the type in front of each resource
+            # in the array. For example: 
+            # :samples => [{:sample => {sample1}, {:sample => {sample2}}, ...]
+            value = value.map { |v| {s2_resource_singular(key) => v} } 
           end
 
           case value
@@ -100,8 +108,22 @@ module Lims::WarehouseBuilder
         ResourceTools::Database::S2_MODELS.include?(name)
       end
 
+      # @param [String] name
+      # @return [Bool]
+      def self.is_s2_resources_array?(name, value)
+        singular_name = s2_resource_singular(name)
+        singular_name ? is_s2_resource?(singular_name) && value.is_a?(Array) : false 
+      end
+
+      # @param [String] name
+      # @return [String]
+      def self.s2_resource_singular(name)
+        name.match(/^(\w*)s$/) ? $1 : nil
+      end
+
+      # @param [Hash] options
       # @return [Array<Sequel::Model>]
-      def _call
+      def _call(options)
         [map_attributes_to_model(prepared_model(@payload["uuid"], @model))]
       end
 
@@ -140,7 +162,7 @@ module Lims::WarehouseBuilder
         (model.columns - [model.primary_key]).each do |attribute|
           payload_key = model.class.translations.inverse[attribute] || attribute.to_s 
           value = seek(payload, payload_key)
-          model.send("#{attribute}=", value) if value
+          model.send("#{attribute}=", value) unless value.nil? # use nil? otherwise side effect with boolean values
         end
         model
       end

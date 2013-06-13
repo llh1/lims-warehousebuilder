@@ -1,15 +1,45 @@
-DNA_RNA_MANUAL_EXTRACTION_ROLES = ["manual_dna_and_rna_input_tube_nap",
-                                   "manual_dna_and_rna_binding_input_tube_nap",
-                                   "manual_spin_column_dna",
-                                   "manual_dna_and_rna_byproduct_tube_rnap",
-                                   "manual_extracted_tube_dna",
-                                   "manual_dna_and_rna_binding_input_tube_rnap",
-                                   "manual_spin_column_rna",
-                                   "manual_extracted_tube_rna",
-                                   "manual_name_rna",
-                                   "manual_name_dna",
-                                   "manual_stock_rna",
-                                   "manual_stock_dna"]
+require 'lims-warehousebuilder/core_ext'
+
+DNA_RNA_MANUAL_EXTRACTION_ROLES = [
+  "eppendorf_tube_dna",
+  "eppendorf_tube_dna_to_be_retubed_batched",
+  "eppendorf_tube_rna",
+  "eppendorf_tube_rna_to_be_retubed_batched",
+  "fluidx_tube_dna_to_be_racked",
+  "fluidx_tube_rna_to_be_racked",
+  "manual_dna_and_rna_byproduct_tube_rnap",
+  "manual_dna_and_rna_input_tube_nap",
+  "manual_dna_and_rna_input_tube_nap_batched",
+  "manual_dna_and_rna_input_tube_rnap_batched",
+  "manual_dna_only_input_tube_dnap",
+  "manual_dna_only_input_tube_dnap_batched",
+  "manual_rna_only_input_tube_rnap",
+  "manual_rna_only_input_tube_rnap_batched",
+  "manual_spin_column_dna",
+  "manual_spin_column_rna",
+  "qiacube_dna_and_rna_byproduct_tube_rnap",
+  "qiacube_dna_and_rna_input_tube_dnap_batched",
+  "qiacube_dna_and_rna_input_tube_dnap_to_be_retubed",
+  "qiacube_dna_and_rna_input_tube_nap",
+  "qiacube_dna_and_rna_input_tube_nap_batched",
+  "qiacube_dna_and_rna_input_tube_nap_to_be_retubed_batched",
+  "qiacube_dna_and_rna_input_tube_rnap_batched",
+  "qiacube_dna_only_input_tube_dnap",
+  "qiacube_dna_only_input_tube_dnap_batched",
+  "qiacube_dna_only_input_tube_dnap_to_be_retubed",
+  "qiacube_dna_only_input_tube_dnap_to_be_retubed_batched",
+  "qiacube_rna_only_input_tube_rnap",
+  "qiacube_rna_only_input_tube_rnap_batched",
+  "qiacube_rna_only_input_tube_rnap_to_be_retubed",
+  "qiacube_rna_only_input_tube_rnap_to_be_retubed_batched",
+  "plates_working_dilution_dna",
+  "plates_working_dilution_rna",
+  "rack_stock_dna",
+  "rack_stock_dna_volume_checked",
+  "rack_stock_dna_volume_control_added",
+  "rack_stock_rna",
+  "rack_stock_rna_volume_checked"
+].map(&:contract)
 # TODO: add cancelled and failed
 ORDER_ITEM_STATUS = ["pending", "in_progress", "done", "unused"]
 
@@ -20,12 +50,12 @@ Sequel.migration do
     [:current_sample_management_activity, :historic_sample_management_activity].each do |table|
       sequel = "create_table :#{table} do;".tap do |s|
         s << "primary_key :internal_id;"
-        s << "String :uuid, :fixed => true, :size => 64;"
+        s << "String :uuid, :fixed => true, :size => 64;" << "\n"
         DNA_RNA_MANUAL_EXTRACTION_ROLES.each do |role|
-          s << "String :#{role}_uuid, :fixed => true, :size => 64;"
+          s << "String :#{role}_uuid, :fixed => true, :size => 64;" << "\n"
           ORDER_ITEM_STATUS.each do |status|
-            s << "String :#{role}_#{status}_by;"
-            s << "DateTime :#{role}_#{status}_at;"
+            s << "String :#{role}_#{status}_by, :fixed => true, :size => 64;" << "\n"
+            s << "DateTime :#{role}_#{status}_at;" << "\n"
           end
         end
         s << "index :uuid;" if table.to_s == "current_sample_management_activity"

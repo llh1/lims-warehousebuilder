@@ -67,4 +67,3 @@ module Lims::WarehouseBuilder
     end
   end
 end
-

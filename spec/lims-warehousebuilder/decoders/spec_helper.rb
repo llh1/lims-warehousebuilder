@@ -1,4 +1,5 @@
 require 'lims-warehousebuilder/spec_helper'
+require 'lims-warehousebuilder/builder'
 
 shared_examples_for "a decoder" do
   it "can be called" do
@@ -12,4 +13,3 @@ shared_examples_for "a decoder" do
     end
   end
 end
-

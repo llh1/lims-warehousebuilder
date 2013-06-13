@@ -2,9 +2,11 @@
 
 # Usage: worker identity action
 # Eg: worker warehouse_two.production.1 start
+DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+APPDIR="$( dirname ${DIR} )"
 
 function worker_start() {
-  cd `pwd`
+  cd ${APPDIR}
   [ -z "$WORKER_PIDS_PATH" ] && { echo "WORKER_PIDS_PATH needs to be set"; exit 1; }
   if [ ! -f $WORKER_PIDS_PATH/worker.${1}.pid ]
   then
@@ -18,13 +20,17 @@ function worker_start() {
 }
 
 function worker_stop() {
-  cd `pwd`
+  cd ${APPDIR}
   [ -z "$WORKER_PIDS_PATH" ] && { echo "WORKER_PIDS_PATH needs to be set"; exit 1; }
   kill -9 `cat $WORKER_PIDS_PATH/worker.${1}.pid`
   if [ -f $WORKER_PIDS_PATH/worker.${1}.pid ]; then rm $WORKER_PIDS_PATH/worker.${1}.pid; fi
 }
 
 function worker_restart() {
+  worker_stop
+  worker_start
+}
+function worker_reboot() {
   worker_stop
   worker_start
 }

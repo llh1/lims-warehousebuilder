@@ -15,7 +15,6 @@ module Lims::WarehouseBuilder
     let(:object) do 
       @model.tap do |s|
         s.uuid = uuid
-        s.name = name
         s.created_at = created_at
         s.created_by = created_by
       end
@@ -23,7 +22,6 @@ module Lims::WarehouseBuilder
 
     let(:updated_object) do
       @model_helper.clone_model_object(object).tap do |s|
-        s.name = "sample 1"
       end
     end
 

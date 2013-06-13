@@ -6,7 +6,7 @@ module Lims::WarehouseBuilder
 
       private
 
-      def _call
+      def _call(options)
         order = super
         [order, items, sample_management_activity]
       end
