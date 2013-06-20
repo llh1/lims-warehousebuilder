@@ -15,14 +15,27 @@ module Lims::WarehouseBuilder
     # schema is always up to date with the historic schema.
     def maintain_currency_triggers(table, columns)
       current_table = "current_#{table.to_s.sub(/^[^_]*_/, '')}"
-      new_values = columns.map { |c| "NEW.#{c}" }.join(',')
+      update_columns = columns - [:internal_id]
+      new_values = update_columns.map { |c| "NEW.#{c}" }.join(',')
       
       drop_trigger("maintain_#{current_table}_trigger") 
+      
+      # We don't want to change the internal_id in the current tables
+      # as it will imply to update all the id used in the sample management
+      # activity table. Then, the trigger first gets back the value of the
+      # internal_id, delete that row, and insert a new row using the same
+      # internal_id.
+      # The foreign key constraints need to be disabled during that operation
+      # as sample_management_activity references some of them.
       after_trigger(
         %Q{
         BEGIN
+        DECLARE id INT;
+        SET id = (SELECT internal_id FROM #{current_table} WHERE uuid = NEW.uuid);
+        SET FOREIGN_KEY_CHECKS = 0;
         DELETE FROM #{current_table} WHERE uuid = NEW.uuid;
-        INSERT INTO #{current_table}(#{columns.join(',')}) VALUES(#{new_values});
+        INSERT INTO #{current_table}(#{columns.join(',')}) VALUES(id,#{new_values});
+        SET FOREIGN_KEY_CHECKS = 1;
         END
         },
           :name => "maintain_#{current_table}_trigger",

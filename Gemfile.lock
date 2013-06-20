@@ -41,7 +41,7 @@ GIT
 PATH
   remote: .
   specs:
-    lims-warehousebuilder (0.4.0)
+    lims-warehousebuilder (0.5.0)
       aequitas
       amqp
       facets

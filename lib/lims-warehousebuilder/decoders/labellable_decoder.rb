@@ -12,7 +12,7 @@ module Lims::WarehouseBuilder
 
       def barcodes
         barcoded_resource_uuid = @payload["name"]
-        klass = model_for("barcode")
+        klass = Model.model_for("barcode")
 
         [].tap do |barcodes|
           @payload["labels"].each do |position, label|
@@ -23,7 +23,7 @@ module Lims::WarehouseBuilder
                         when /ean13/ then klass.barcode_by_ean13_barcode(label_value)
                         end
 
-              new_barcode = clone_model_object(barcode)
+              new_barcode = Model.clone_model_object(barcode)
               new_barcode.barcoded_resource_uuid = barcoded_resource_uuid
               new_barcode.position = position
               barcodes << new_barcode

@@ -8,15 +8,13 @@ require_all('models/*.rb')
 module Lims::WarehouseBuilder
   module Model
 
-    class NotFound < StandardError
-    end
-
-    class UnknownModel < StandardError
-    end
+    NotFound = Class.new(StandardError)
+    UnknownModel = Class.new(StandardError)
+    DBSchemaError = Class.new(StandardError)
 
     # @param [String] name
     # @return [Class]
-    def model_for(name)
+    def self.model_for(name)
       lower_name = name.downcase
       alphanum_name = lower_name.gsub(/_/, "")
       return NameToSequel[alphanum_name] if NameToSequel[alphanum_name]
@@ -24,7 +22,7 @@ module Lims::WarehouseBuilder
       plural_name = "#{lower_name}s"
       if ResourceTools::Database::MODEL_TABLES.include?(plural_name) ||
         ResourceTools::Database::MODEL_TABLES.include?(lower_name)
-        return generate_model(lower_name)
+        return self.generate_model(lower_name)
       else
         raise UnknownModel, "unknown required model (#{lower_name})"
       end
@@ -32,12 +30,14 @@ module Lims::WarehouseBuilder
 
     # @param [String] uuid
     # @param [Nil, String] modelname
-    # @return [Sequel::Model,Nil]
+    # @return [Sequel::Model]
     # Lookup in the database for the model type corresponding 
     # to the uuid in parameter.
-    def model_for_uuid(uuid, modelname)
+    def self.model_for_uuid(uuid, modelname)
       model = model_for(modelname)
-      model.from(model.current_table_name).where(:uuid => uuid).first
+      result = model.from(model.current_table_name).where(:uuid => uuid).first
+      raise NotFound, "Cannot found record for uuid #{uuid} and model #{modelname}" unless result
+      result
     end
 
     # @param [String] uuid
@@ -48,20 +48,24 @@ module Lims::WarehouseBuilder
     # we create a new model instance using the values of that 
     # existing model.
     def prepared_model(uuid, modelname)
-      model = model_for_uuid(uuid, modelname)
-      model ? model.class.new(model.values - [model.primary_key]) : model_for(modelname).new
+      begin
+        model = Model.model_for_uuid(uuid, modelname)
+        model.class.new(model.values - [model.primary_key])
+      rescue NotFound
+        Model.model_for(modelname).new
+      end
     end
 
     # @param [Sequel::Model] object
     # @return [Sequel::Model]
-    def clone_model_object(object)
+    def self.clone_model_object(object)
       values = object.values.reject { |k,v| k == object.primary_key }
       object.class.new(values)
     end
 
     private
 
-    def generate_model(name)
+    def self.generate_model(name)
       class_name = name.capitalize.gsub(/_[^_]*/) { |b| b[1..b.size].capitalize }
       Model.class_eval %Q{
           class #{class_name} < Sequel::Model(:historic_#{name}s)

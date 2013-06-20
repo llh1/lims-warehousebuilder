@@ -63,7 +63,7 @@ module Lims::WarehouseBuilder::Decoder
     context "map attributes to a model" do
       let(:model) { Model::Tube.new }
       let(:mapped_model) { described_class.new.map_attributes_to_model(model, payload) }
-      
+      pending    
     end
   end
 end
