@@ -18,6 +18,9 @@ module Lims::WarehouseBuilder
       def initialize(model, payload)
         @model = model 
         @payload = payload
+        @date = payload["date"]
+        @user = payload["user"]
+        @uuid = payload["uuid"]
       end
 
       # @param [Hash] options
