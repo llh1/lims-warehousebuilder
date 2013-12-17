@@ -3,13 +3,14 @@ require 'yaml'
 require 'timecop'
 require 'sequel'
 require 'lims-warehousebuilder/sequel'
-require 'lims-warehousebuilder/table_migration'
+require 'lims-warehousebuilder/base_trigger'
 require 'lims-warehousebuilder/model'
 
 # Triggers setup
-DB.tables.select { |table| table =~ /historic/ }.each do |table|
-  migration = Class.new { include Lims::WarehouseBuilder::TableMigration }.new
-  migration.maintain_warehouse_for(table, DB[table.to_sym].columns)
+module Lims::WarehouseBuilder
+  Helpers::Database::S2_MODELS.each do |model_name|
+    Trigger.trigger_for(Model.model_for(model_name)).setup
+  end
 end
 
 shared_context 'use database' do

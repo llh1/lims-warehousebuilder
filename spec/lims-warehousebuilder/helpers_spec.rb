@@ -1,9 +1,8 @@
 require 'lims-warehousebuilder/spec_helper'
 require 'lims-warehousebuilder/sequel'
-require 'lims-warehousebuilder/spec_helper'
-require 'lims-warehousebuilder/resource_tools'
+require 'lims-warehousebuilder/helpers'
 
-module Lims::WarehouseBuilder::ResourceTools
+module Lims::WarehouseBuilder::Helpers
   describe "Nested Hash" do
     let(:nested_hash) { {:a => 1, :b => {:c => 2, :d => {:e => [3], :f => {"uuid" => "456"}}, :g => 5}, :h => {"uuid" => "123"}, :i => nil} }
     let(:object) { Class.new { include NestedHash }.new }
