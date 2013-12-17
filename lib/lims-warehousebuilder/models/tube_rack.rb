@@ -4,7 +4,7 @@ module Lims::WarehouseBuilder
   module Model
     class TubeRack < Sequel::Model(DB[:historic_tube_racks])
       
-      include ResourceTools::Mapping
+      include Helpers::Mapping
       include Common
 
       def self.tube_rack_by_uuid(uuid)

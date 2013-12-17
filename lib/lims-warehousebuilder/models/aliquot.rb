@@ -1,12 +1,12 @@
 require 'lims-warehousebuilder/models/common'
-require 'lims-warehousebuilder/resource_tools'
+require 'lims-warehousebuilder/helpers'
 
 module Lims::WarehouseBuilder
   module Model
     class Aliquot < Sequel::Model(DB[:historic_aliquots])
 
       include Common
-      include ResourceTools::Mapping
+      include Helpers::Mapping
 
       # @param [String] container_uuid
       # @param [Integer] position

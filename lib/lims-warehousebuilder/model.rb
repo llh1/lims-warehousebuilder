@@ -2,7 +2,7 @@ require 'facets/kernel'
 require 'sequel'
 # A sequel connection is needed before loading all the models
 require 'lims-warehousebuilder/sequel'
-require 'lims-warehousebuilder/resource_tools'
+require 'lims-warehousebuilder/helpers'
 require_all('models/*.rb')
 
 module Lims::WarehouseBuilder
@@ -20,8 +20,8 @@ module Lims::WarehouseBuilder
       return NameToSequel[alphanum_name] if NameToSequel[alphanum_name]
 
       plural_name = "#{lower_name}s"
-      if ResourceTools::Database::MODEL_TABLES.include?(plural_name) ||
-        ResourceTools::Database::MODEL_TABLES.include?(lower_name)
+      if Helpers::Database::MODEL_TABLES.include?(plural_name) ||
+        Helpers::Database::MODEL_TABLES.include?(lower_name)
         return self.generate_model(lower_name)
       else
         raise UnknownModel, "unknown required model (#{lower_name})"

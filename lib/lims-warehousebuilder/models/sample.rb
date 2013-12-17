@@ -4,7 +4,7 @@ module Lims::WarehouseBuilder
   module Model
     class Sample < Sequel::Model(DB[:historic_samples])
       
-      include ResourceTools::Mapping
+      include Helpers::Mapping
       include Common
 
       translate({

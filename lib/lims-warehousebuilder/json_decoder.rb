@@ -1,15 +1,15 @@
 require 'json'
 require 'facets/kernel'
 require 'lims-warehousebuilder/model'
-require 'lims-warehousebuilder/resource_tools'
+require 'lims-warehousebuilder/helpers'
 
 module Lims::WarehouseBuilder
   module Decoder
     class JsonDecoder
 
       include Model
-      include ResourceTools::Database
-      include ResourceTools::NestedHash
+      include Helpers::Database
+      include Helpers::NestedHash
 
       SHARED_ATTRIBUTES = %w{date user action}
 
@@ -131,7 +131,7 @@ module Lims::WarehouseBuilder
       # for the case a s2 resource doesn't have direct corresponding
       # model in the warehouse. For example: labellable.
       def self.is_s2_resource_name?(name)
-        (ResourceTools::Database::S2_MODELS | NameToDecoder.keys - ["json"]).include?(name)
+        (Helpers::Database::S2_MODELS | NameToDecoder.keys - ["json"]).include?(name)
       end
 
       # @param [String] name

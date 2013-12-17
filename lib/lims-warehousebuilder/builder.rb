@@ -1,6 +1,7 @@
 require 'lims-busclient'
 require 'lims-warehousebuilder/json_decoder'
 require 'lims-warehousebuilder/base_trigger'
+require 'lims-warehousebuilder/helpers'
 require 'set'
 
 module Lims
@@ -102,11 +103,11 @@ module Lims
         Set.new.tap do |models|
           objects.each do |o| 
             klass = o.class
-            next unless ResourceTools::Database::HISTORIC_TABLES.include?(klass.table_name.to_s)
+            next unless Helpers::Database::HISTORIC_TABLES.include?(klass.table_name.to_s)
             models << klass 
           end
-        end.each do |model|
-          Trigger.trigger_for(model).setup
+        end.each do |model_class|
+          Trigger.trigger_for(model_class).setup
         end
       end
     end

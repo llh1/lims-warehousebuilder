@@ -1,7 +1,7 @@
 require 'facets'
 
 module Lims::WarehouseBuilder
-  module ResourceTools
+  module Helpers
     module Mapping
       def self.included(klass)
         klass.extend ClassMethods
