@@ -72,7 +72,7 @@ module Lims::WarehouseBuilder
       class_name = class_name(name)
       Model.class_eval %Q{
           class #{class_name} < Sequel::Model(DB[:historic_#{name}s])
-            include ResourceTools::Mapping
+            include Helpers::Mapping
             include Common
 
             def self.#{name}_by_uuid(uuid)

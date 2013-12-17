@@ -1,5 +1,3 @@
-require 'lims-warehousebuilder/table_migration'
-
 module Lims::WarehouseBuilder
   module Model
     module Common
