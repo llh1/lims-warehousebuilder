@@ -41,8 +41,6 @@ module Lims::WarehouseBuilder
       # If we find a sample, we add to its payload the resource
       # which includes the sample, for example a tube and its uuid.
       def self.foreach_s2_resource(payload, payload_ancestor = {}, model=nil, &block) 
-        payload = payload.is_a?(Hash) ? payload : self.to_hash(payload)
-
         payload.each do |key, value|
           next unless value.is_a?(Hash) || value.is_a?(Array) # Prevent useless loop
           singular_key = s2_resource_singular(key)
@@ -101,12 +99,6 @@ module Lims::WarehouseBuilder
       def self.decoder_for(name)
         name_alphanum = name.gsub(/[^0-9a-zA-Z]/, '')
         NameToDecoder[name_alphanum] ? NameToDecoder[name_alphanum] : NameToDecoder["json"]
-      end
-
-      # @param [String] json
-      # @return [Hash]
-      def self.to_hash(json)
-        JSON.parse(json)
       end
 
       protected
