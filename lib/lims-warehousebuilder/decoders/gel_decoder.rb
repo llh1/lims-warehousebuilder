@@ -16,7 +16,7 @@ module Lims::WarehouseBuilder
       def gel_aliquots
         [].tap do |decoded_aliquots|
           @payload["windows"].each do |position, aliquots|
-            decoded_aliquots << decode_aliquots(aliquots, "position" => position)
+            decoded_aliquots << decode_aliquots(aliquots, position)
           end
         end
       end

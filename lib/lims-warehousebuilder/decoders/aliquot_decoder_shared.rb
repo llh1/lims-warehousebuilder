@@ -5,11 +5,9 @@ module Lims::WarehouseBuilder
     module AliquotDecoderShared
 
       # @param [Hash] aliquots
-      # @param [Hash] params
+      # @param [String] position
       # @return [Array<Model::Aliquot>]
-      def decode_aliquots(aliquots, params={})
-        position = params["position"]
-
+      def decode_aliquots(aliquots, position=nil)
         [].tap do |decoded_aliquots|
           aliquots.each do |aliquot|
             # if there is no sample associated to the aliquot, it usually 
