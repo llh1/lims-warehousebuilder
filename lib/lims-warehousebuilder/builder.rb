@@ -1,6 +1,7 @@
 require 'lims-busclient'
 require 'lims-warehousebuilder/json_decoder'
-require 'lims-warehousebuilder/table_migration'
+require 'lims-warehousebuilder/base_trigger'
+require 'set'
 
 module Lims
   module WarehouseBuilder
@@ -10,7 +11,6 @@ module Lims
 
     class Builder
       include Lims::BusClient::Consumer
-      include TableMigration
 
       attribute :queue_name, String, :required => true, :writer => :private
       attribute :log, Object, :required => false, :writer => :private
@@ -36,10 +36,11 @@ module Lims
       # the resource gives back an instance of a Sequel model, ready 
       # to be saved in the warehouse.
       def set_queue
-        self.add_queue(queue_name) do |metadata, payload|
+        self.add_queue(queue_name) do |metadata, json_payload|
           log.info("Message received with the routing key: #{metadata.routing_key}")
-          log.debug("Processing message with routing key: '#{metadata.routing_key}' and payload: #{payload}")
+          log.debug("Processing message with routing key: '#{metadata.routing_key}' and payload: #{json_payload}")
           begin
+            payload = JSON.parse(json_payload)
             action = metadata.routing_key.match(/^[\w\.]*\.(\w*)$/)[1]
             objects = decode_payload(payload, action)
             maintain_warehouse(objects)
@@ -93,15 +94,19 @@ module Lims
 
       # @param [Array<Sequel::Model>] objects
       # Setup the triggers in the warehouse for each model involved
+      # We first look for the model classes without duplicate so we
+      # don't setup the same trigger twice.
+      # The triggers are setup only for model associated with a
+      # historic/current table.
       def maintain_warehouse(objects)
-        {}.tap do |tables|
-          objects.each do |o|
+        Set.new.tap do |models|
+          objects.each do |o| 
             klass = o.class
             next unless ResourceTools::Database::HISTORIC_TABLES.include?(klass.table_name.to_s)
-            tables[klass.table_name] = klass.columns
+            models << klass 
           end
-        end.each do |table_name, columns|
-          maintain_warehouse_for(table_name, columns)
+        end.each do |model|
+          Trigger.trigger_for(model).setup
         end
       end
     end
